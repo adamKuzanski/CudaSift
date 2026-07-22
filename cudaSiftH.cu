@@ -40,7 +40,7 @@ void InitSiftData(SiftData &data, int num, bool host, bool dev)
   data.h_data = NULL;
   if (host)
   {
-    data.h_data = (SiftPoint *)malloc(sz);
+    safeCall(cudaMallocHost((void **)&data.h_data, sz));
   }
   data.d_data = NULL;
   if (dev)
@@ -62,8 +62,9 @@ void FreeSiftData(SiftData &data)
   data.d_data = NULL;
   if (data.h_data != NULL)
   {
-    free(data.h_data);
+    safeCall(cudaFreeHost(data.h_data)); // matches cudaMallocHost in InitSiftData
   }
+  data.h_data = NULL;
 #endif
   data.numPts = 0;
   data.maxPts = 0;
